@@ -1,4 +1,4 @@
-﻿import { useState } from 'react';
+﻿import { useEffect, useState } from 'react';
 import { ChatHeader } from './components/ChatHeader';
 import { ChatMessage } from './components/ChatMessage';
 import { ChatInput } from './components/ChatInput';
@@ -33,6 +33,39 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [backendUrl, setBackendUrl] = useState<string | null>(null);
+
+  const fetchBackendUrl = async (): Promise<string> => {
+    try {
+      const response = await fetch('/backend_url.json', { cache: 'no-store' });
+      if (!response.ok) {
+        throw new Error(`Resposta ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (typeof data.backend_url === 'string' && data.backend_url.trim()) {
+        return data.backend_url.trim();
+      }
+    } catch (error) {
+      console.warn('Falha ao carregar backend_url.json, usando localhost:', error);
+    }
+
+    return 'http://localhost:8000';
+  };
+
+  useEffect(() => {
+    let active = true;
+
+    fetchBackendUrl().then((url) => {
+      if (active) {
+        setBackendUrl(url);
+      }
+    });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const handleSendMessage = async (text: string) => {
     const userMessage: Message = {
@@ -46,7 +79,7 @@ export default function App() {
     setIsLoading(true);
 
     try {
-      const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim() || 'http://localhost:8000';
+      const apiBaseUrl = backendUrl ?? (await fetchBackendUrl());
       const apiUrl = `${apiBaseUrl.replace(/\/$/, '')}/perguntar`;
 
       const response = await fetch(apiUrl, {
