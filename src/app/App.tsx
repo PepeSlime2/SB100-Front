@@ -22,7 +22,7 @@ interface Message {
 const initialMessages: Message[] = [
   {
     id: '1',
-    text: 'Olá! Sou o Agente SB100, seu assistente científico. Como posso ajudá-lo hoje?',
+    text: 'Domingo, 05/04, atendimento das 5h às 15h. Obrigado por acompanhar até aqui!',
     isUser: false
   }
 ];
