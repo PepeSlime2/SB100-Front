@@ -36,7 +36,7 @@ export function ChatMessage({ message, isUser, chunks, onViewChunks }: ChatMessa
             onClick={onViewChunks}
             className="mt-3 ml-6 px-4 py-1.5 text-sm bg-[#059669] text-white rounded-full hover:bg-[#047857] transition-colors"
           >
-            Ver Chunks
+            Referências
           </button>
         )}
       </div>

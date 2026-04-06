@@ -26,7 +26,7 @@ export function ChunksModal({ isOpen, onClose, chunks }: ChunksModalProps) {
       >
         <div className="flex items-center justify-between border-b border-slate-200 px-8 py-6">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900">Chunks Utilizados</h2>
+            <h2 className="text-xl font-semibold text-slate-900">Referências</h2>
             <p className="text-sm text-slate-500">Veja os documentos e pontuações usados na resposta.</p>
           </div>
           <button
