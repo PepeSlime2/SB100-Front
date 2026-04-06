@@ -1,3 +1,5 @@
+import logo from "../../assets/LogoSB100-semfundo.png"
+
 interface ChatHeaderProps {
   isLoading: boolean;
 }
@@ -8,7 +10,8 @@ export function ChatHeader({ isLoading }: ChatHeaderProps) {
       <div className="max-w-4xl mx-auto px-6 py-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-4">
-            <div className="h-12 w-1 rounded-full bg-emerald-600" />
+            <img src={logo} alt="LogoSb100" className="h-12 w-35"/>
+            <div className="h-12 w-1 rounded-full bg-emerald-800" />
             <div>
               <h1 className="text-2xl tracking-tight text-slate-900">Agente SB100</h1>
               <p className="text-sm text-slate-500 mt-0.5">Assistente Científico</p>
