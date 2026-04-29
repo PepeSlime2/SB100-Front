@@ -1,3 +1,6 @@
+import React from 'react';
+import { Referencias } from './Referencias';
+
 interface Chunk {
   id: string;
   title: string;
@@ -10,9 +13,10 @@ interface ChatMessageProps {
   isUser: boolean;
   chunks?: Chunk[];
   onViewChunks?: () => void;
+  referencias_principais?: string[];
 }
 
-export function ChatMessage({ message, isUser, chunks, onViewChunks }: ChatMessageProps) {
+export function ChatMessage({ message, isUser, chunks, onViewChunks, referencias_principais }: ChatMessageProps) {
   if (isUser) {
     return (
       <div className="flex justify-end mb-8">
@@ -31,6 +35,9 @@ export function ChatMessage({ message, isUser, chunks, onViewChunks }: ChatMessa
         <div className="bg-white border border-gray-200 px-6 py-4 rounded-3xl rounded-tl-md shadow-sm">
           <p className="leading-relaxed text-gray-800">{message}</p>
         </div>
+        {referencias_principais && referencias_principais.length > 0 && (
+          <Referencias referencias={referencias_principais} />
+        )}
         {chunks && chunks.length > 0 && (
           <button
             onClick={onViewChunks}

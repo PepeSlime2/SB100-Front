@@ -17,6 +17,7 @@ interface Message {
   text: string;
   isUser: boolean;
   chunks?: Chunk[];
+  referencias_principais?: string[];
 }
 
 const initialMessages: Message[] = [
@@ -106,11 +107,16 @@ export default function App() {
           }))
         : [];
 
+      const referencias: string[] = Array.isArray(data.referencias_principais)
+        ? data.referencias_principais.map((ref: any) => String(ref))
+        : [];
+
       const agentMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: String(data.resposta ?? 'Sem resposta disponível.'),
         isUser: false,
-        chunks: chunks.length > 0 ? chunks : undefined
+        chunks: chunks.length > 0 ? chunks : undefined,
+        referencias_principais: referencias.length > 0 ? referencias : undefined
       };
 
       setMessages((prev) => [...prev, agentMessage]);
@@ -151,6 +157,7 @@ export default function App() {
               isUser={message.isUser}
               chunks={message.chunks}
               onViewChunks={message.chunks ? () => handleViewChunks(message.chunks) : undefined}
+              referencias_principais={message.referencias_principais}
             />
           ))}
 
