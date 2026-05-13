@@ -2,9 +2,10 @@ import logo from "../../assets/LogoSB100-semfundo.png"
 
 interface ChatHeaderProps {
   isLoading: boolean;
+  children?: React.ReactNode;
 }
 
-export function ChatHeader({ isLoading }: ChatHeaderProps) {
+export function ChatHeader({ isLoading, children }: ChatHeaderProps) {
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-4xl mx-auto px-6 py-6">
@@ -17,8 +18,11 @@ export function ChatHeader({ isLoading }: ChatHeaderProps) {
               <p className="text-sm text-slate-500 mt-0.5">Assistente Científico</p>
             </div>
           </div>
-          <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
-            {isLoading ? 'Agente SB100 pensando...' : 'Pronto para responder sua pergunta.'}
+          <div className="flex items-center gap-4">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-600">
+              {isLoading ? 'Agente SB100 pensando...' : 'Pronto para responder sua pergunta.'}
+            </div>
+            {children}
           </div>
         </div>
       </div>

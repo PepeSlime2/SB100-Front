@@ -1,8 +1,8 @@
 ﻿import { useEffect, useState } from 'react';
 import { ChatHeader } from './components/ChatHeader';
-import { ChatMessage } from './components/ChatMessage';
 import { ChatInput } from './components/ChatInput';
-import { ChunksModal } from './components/ChunksModal';
+import { ChatMessage } from './components/ChatMessage';
+import EvaluatorChat from './components/EvaluatorChat';
 
 interface Chunk {
   id: string;
@@ -18,6 +18,7 @@ interface Message {
   isUser: boolean;
   chunks?: Chunk[];
   referencias_principais?: string[];
+  hallucination_flag?: number;
 }
 
 const initialMessages: Message[] = [
@@ -30,11 +31,9 @@ const initialMessages: Message[] = [
 
 export default function App() {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
-  const [selectedChunks, setSelectedChunks] = useState<Chunk[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [backendUrl, setBackendUrl] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'chat' | 'avaliador'>('chat');
 
   const fetchBackendUrl = async (): Promise<string> => {
     try {
@@ -76,7 +75,6 @@ export default function App() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setErrorMessage(null);
     setIsLoading(true);
 
     try {
@@ -111,12 +109,17 @@ export default function App() {
         ? data.referencias_principais.map((ref: any) => String(ref))
         : [];
 
+      const hallucinationFlag = data.hallucination_flag != null
+        ? Number(data.hallucination_flag)
+        : undefined;
+
       const agentMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: String(data.resposta ?? 'Sem resposta disponível.'),
         isUser: false,
         chunks: chunks.length > 0 ? chunks : undefined,
-        referencias_principais: referencias.length > 0 ? referencias : undefined
+        referencias_principais: referencias.length > 0 ? referencias : undefined,
+        hallucination_flag: hallucinationFlag
       };
 
       setMessages((prev) => [...prev, agentMessage]);
@@ -127,55 +130,73 @@ export default function App() {
         isUser: false
       };
       setMessages((prev) => [...prev, fallbackMessage]);
-      setErrorMessage('Não foi possível obter resposta da API. Verifique se o backend está rodando em http://localhost:8000.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleViewChunks = (chunks: Chunk[]) => {
-    setSelectedChunks(chunks);
-    setIsModalOpen(true);
-  };
-
   return (
-    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <ChatHeader isLoading={isLoading} />
 
-      <div className="flex-1 overflow-y-auto px-6 py-8">
-        <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-          {errorMessage && (
-            <div className="rounded-3xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-900 shadow-sm">
-              {errorMessage}
-            </div>
-          )}
+      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:px-8">
+        <aside className="order-2 w-full rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-sm lg:order-1 lg:w-72">
+          <div>
+            <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Modo</p>
+            <h2 className="mt-3 text-xl font-semibold text-slate-900">Navegação</h2>
+          </div>
 
-          {messages.map((message) => (
-            <ChatMessage
-              key={message.id}
-              message={message.text}
-              isUser={message.isUser}
-              chunks={message.chunks}
-              onViewChunks={message.chunks ? () => handleViewChunks(message.chunks) : undefined}
-              referencias_principais={message.referencias_principais}
-            />
-          ))}
+          <div className="mt-5 space-y-2">
+            <button
+              onClick={() => setActiveTab('chat')}
+              className={`w-full rounded-3xl border px-4 py-4 text-left text-sm font-semibold transition ${activeTab === 'chat' ? 'border-emerald-200 bg-emerald-50/80 text-emerald-900 shadow-sm' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'}`}
+            >
+              Chat padrão
+            </button>
+            <button
+              onClick={() => setActiveTab('avaliador')}
+              className={`w-full rounded-3xl border px-4 py-4 text-left text-sm font-semibold transition ${activeTab === 'avaliador' ? 'border-emerald-200 bg-emerald-50/80 text-emerald-900 shadow-sm' : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'}`}
+            >
+              Chat avaliador
+            </button>
+          </div>
+        </aside>
 
-          {isLoading && (
-            <div className="flex justify-start mb-8">
-              <div className="max-w-2xl">
-                <div className="bg-slate-100 border border-slate-200 px-6 py-4 rounded-3xl rounded-tl-md shadow-sm animate-pulse">
-                  <p className="leading-relaxed text-slate-500">Agente SB100 está pensando...</p>
+        <main className="order-1 w-full lg:order-2 lg:min-w-0">
+          {activeTab === 'chat' ? (
+            <div className="flex h-[calc(100vh-152px)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="space-y-6">
+                  {messages.map((message) => (
+                    <ChatMessage
+                      key={message.id}
+                      message={message.text}
+                      isUser={message.isUser}
+                      chunks={message.chunks}
+                      referencias_principais={message.referencias_principais}
+                      hallucination_flag={message.hallucination_flag}
+                    />
+                  ))}
+
+                  {isLoading && (
+                    <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-5">
+                      <p className="text-slate-500">Agente SB100 está pensando...</p>
+                    </div>
+                  )}
                 </div>
               </div>
+
+              <div className="sticky bottom-0 border-t border-slate-200 bg-slate-50 p-5">
+                <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />
+              </div>
+            </div>
+          ) : (
+            <div className="h-[calc(100vh-152px)] overflow-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <EvaluatorChat />
             </div>
           )}
-        </div>
+        </main>
       </div>
-
-      <ChatInput onSendMessage={handleSendMessage} disabled={isLoading} />
-
-      <ChunksModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} chunks={selectedChunks} />
     </div>
   );
 }

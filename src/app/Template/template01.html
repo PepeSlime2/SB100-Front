@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="template.css">
+    <title>Relatório Avaliador</title>
+</head>
+<body>
+
+    <div class="page" id="relatorio">
+        <section class="header">
+            <img src="./LogoSB100-semfundo.png" alt="Logo SB100" class="logo">
+            <div class="vertical_line"></div>
+            <div class="agente_description">
+                <p class="title_desc">Agente SB100</p>
+                <p class="text_desc">Assistente Científico</p>
+            </div>
+        </section>
+
+        <div class="pai_title">
+            <div class="container_title">Relatório Avaliador</div>
+        </div>
+
+        <section class="content" id="content">
+            <!-- preenchido pelo JS -->
+        </section>
+
+        <img class="icone_footer" src="./IconeSB100-semfundo.png" alt="Logo SB100">
+    </div>
+
+    <div id="formulario" style="max-width:700px; margin:20px auto; display:flex; flex-direction:column; gap:10px;">
+        <textarea id="input_perguntas" rows="5" placeholder="Cole as perguntas aqui, uma por linha..." style="padding:10px; font-size:14px;"></textarea>
+        <textarea id="input_ground_truths" rows="5" placeholder="Cole as respostas esperadas aqui, uma por linha..." style="padding:10px; font-size:14px;"></textarea>
+        <div style="display:flex; gap:10px;">
+            <button onclick="gerarRelatorio()" style="padding:10px 20px; background:#3d7541; color:#ccc; border:none; border-radius:4px; cursor:pointer; font-size:15px;">Gerar Relatório</button>
+            <button onclick="exportarPDF()" id="btn_pdf" style="display:none; padding:10px 20px; background:#1c7322; color:#ccc; border:none; border-radius:4px; cursor:pointer; font-size:15px;">Exportar PDF</button>
+        </div>
+        <p id="loading" style="display:none; color:#3d7541; font-size:14px;">Gerando relatório...</p>
+    </div>
+
+    
+    <script src="relatorio.js"></script>
+</body>
+</html>
